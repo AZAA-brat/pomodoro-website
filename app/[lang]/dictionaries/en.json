@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "timer": "Timer",
+    "settings": "Settings",
+    "profile": "Profile"
+  },
+  "timer": {
+    "focus": "Focus",
+    "shortBreak": "Short break",
+    "longBreak": "Long break",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "reset": "Reset",
+    "modes": "Timer mode"
+  },
+  "settings": {
+    "title": "Settings",
+    "background": "Background",
+    "moss": "Black, grey, green",
+    "dusk": "Black, grey, purple, pink",
+    "language": "Language"
+  },
+  "profile": {
+    "title": "Profile",
+    "name": "Your name",
+    "namePlaceholder": "Add your name",
+    "sessions": "Focus sessions completed",
+    "minutes": "Minutes focused"
+  }
+}

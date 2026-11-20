@@ -39,3 +39,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# superdesign temporary drafts
+.superdesign/tmp/
+
+# private keys and certificates
+*.key
+*.p12
+*.pfx
+*.crt
+
+# local AI tool settings
+.claude/settings.local.json
+
+# editors
+.idea/
+.vscode/
+
+# logs
+*.log
