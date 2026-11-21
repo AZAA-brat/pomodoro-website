@@ -17,7 +17,7 @@
 
 /* Dusk: black, grey, purple, pink */
 [data-theme="dusk"] {
-  --surface: #17151b;
+  --surface: #28066d;
   --line: #2e2a35;
   --muted: #938c9c;
   --text: #eee9f2;
@@ -37,6 +37,7 @@
   --color-accent: var(--accent);
   --color-accent-2: var(--accent-2);
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-display: var(--font-archivo), ui-sans-serif, sans-serif;
 }
 
 body {

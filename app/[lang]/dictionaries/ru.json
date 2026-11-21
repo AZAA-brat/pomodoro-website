@@ -12,7 +12,14 @@
     "pause": "Пауза",
     "resume": "Продолжить",
     "reset": "Сброс",
-    "modes": "Режим таймера"
+    "modes": "Режим таймера",
+    "skip": "Пропустить",
+    "task": "Текущая задача",
+    "taskPlaceholder": "Над чем вы работаете?",
+    "shortBreakMessage": "Отойдите от экрана.",
+    "longBreakMessage": "Отдохните подольше. Вы заслужили.",
+    "session": "Сессия {n} из {total}",
+    "sessionsDone": "Завершено сессий: {n} из {total}"
   },
   "settings": {
     "title": "Настройки",

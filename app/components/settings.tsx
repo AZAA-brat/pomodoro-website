@@ -53,7 +53,7 @@ export function Settings({ lang, labels }: { lang: string; labels: Labels }) {
             aria-pressed={theme === t}
             className={`${option} ${theme === t ? "border-accent bg-surface" : "border-line hover:bg-surface"}`}
           >
-            <span className="size-8 shrink-0 rounded-full border border-line" style={{ background: swatches[t] }} />
+            <span className="size-8 shrink-0 rounded-full border border-line" style={{ background: swatches[t] }} suppressHydrationWarning/>
             {labels[t]}
           </button>
         ))}

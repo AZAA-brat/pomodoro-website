@@ -12,7 +12,14 @@
     "pause": "Pause",
     "resume": "Resume",
     "reset": "Reset",
-    "modes": "Timer mode"
+    "modes": "Timer mode",
+    "skip": "Skip",
+    "task": "Current task",
+    "taskPlaceholder": "What are you working on?",
+    "shortBreakMessage": "Step away from the screen.",
+    "longBreakMessage": "Take a longer rest. You earned it.",
+    "session": "Session {n} of {total}",
+    "sessionsDone": "{n} of {total} sessions done"
   },
   "settings": {
     "title": "Settings",

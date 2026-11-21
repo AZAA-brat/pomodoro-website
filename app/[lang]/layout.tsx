@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono } from "next/font/google";
+import { Archivo, JetBrains_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { getDictionary, hasLocale, locales } from "./dictionaries";
 import { Navbar } from "../components/navbar";
 import "../globals.css";
-
+import Script from "next/script";
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin", "cyrillic"],
   weight: ["200", "400", "600"],
+});
+
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  weight: ["400", "900"],
 });
 
 export const metadata: Metadata = {
@@ -34,13 +40,16 @@ export default async function RootLayout({
       lang={lang}
       data-theme="moss"
       suppressHydrationWarning
-      className={`${jetbrainsMono.variable} h-full antialiased`}
+      className={`${jetbrainsMono.variable} ${archivo.variable} h-full antialiased`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
+  <head>
+    <script
+      id="theme-script"
+      dangerouslySetInnerHTML={{ __html: themeScript }}
+    />
+  </head>
       <body className="min-h-full flex flex-col font-mono">
-        <main className="flex flex-1 flex-col items-center justify-center px-4 pt-12 pb-32">
+        <main className="flex flex-1 flex-col items-center justify-center px-4 pt-32 pb-12">
           {children}
         </main>
         <Navbar lang={lang} labels={dict.nav} />
