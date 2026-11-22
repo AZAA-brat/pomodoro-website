@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { getDictionary, hasLocale, locales } from "./dictionaries";
 import { Navbar } from "../components/navbar";
 import "../globals.css";
-import Script from "next/script";
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin", "cyrillic"],
@@ -49,7 +48,7 @@ export default async function RootLayout({
     />
   </head>
       <body className="min-h-full flex flex-col font-mono">
-        <main className="flex flex-1 flex-col items-center justify-center px-4 pt-32 pb-12">
+        <main className="flex flex-1 flex-col items-center justify-center px-4 py-12">
           {children}
         </main>
         <Navbar lang={lang} labels={dict.nav} />
