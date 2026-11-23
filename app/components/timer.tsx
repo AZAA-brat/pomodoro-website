@@ -1,22 +1,16 @@
 "use client";
 
 import { type CSSProperties, useEffect, useRef, useState } from "react";
-import { MINUTES_KEY, SESSIONS_KEY, read, write } from "../lib/storage";
+import { DEFAULT_TIMER_SETTINGS, MINUTES_KEY, SESSIONS_KEY, read, readTimerSettings, write } from "../lib/storage";
 
 type Mode = "focus" | "shortBreak" | "longBreak";
 
-const DURATIONS: Record<Mode, number> = {
-  focus: 25 * 60,
-  shortBreak: 5 * 60,
-  longBreak: 15 * 60,
-};
+const MODES: Mode[] = ["focus", "shortBreak", "longBreak"];
 
-const CYCLE = 4;
-
-// Tide palette: `top` is the drained part, `bottom` is time remaining.
+// Split palette: `top` and `bottom` halves of the background.
 // Focus is pure white/black with difference blending, so white ink flips to black over the white half.
 const SCHEMES: Record<Mode, { top: string; bottom: string; ink: string; blend: boolean }> = {
-  focus: { top: "#ffffff", bottom: "#000000", ink: "#ffffff", blend: true },
+  focus: { top: "#ffffff", bottom: "#7d5026", ink: "#ffffff", blend: true },
   shortBreak: { top: "#faefd6", bottom: "#f2b33a", ink: "#151833", blend: false },
   longBreak: { top: "#e3f5ec", bottom: "#6fd3a8", ink: "#151833", blend: false },
 };
@@ -43,25 +37,35 @@ function format(seconds: number) {
   return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, "0")}`;
 }
 
-function fill(template: string, n: number) {
-  return template.replace("{n}", String(n)).replace("{total}", String(CYCLE));
+function fill(template: string, n: number, total: number) {
+  return template.replace("{n}", String(n)).replace("{total}", String(total));
 }
 
 const outlined =
   "rounded-full border border-(--ink) bg-(--water) px-5 py-2.5 text-[14px] text-(--ink) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--ink)";
 
 export function Timer({ labels }: { labels: Labels }) {
+  const [settings, setSettings] = useState(DEFAULT_TIMER_SETTINGS);
   const [mode, setMode] = useState<Mode>("focus");
-  const [left, setLeft] = useState(DURATIONS.focus);
+  const [left, setLeft] = useState(DEFAULT_TIMER_SETTINGS.focus * 60);
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(0); // focus sessions finished in the current cycle
   const [task, setTask] = useState("");
   const endAt = useRef(0);
+  const cycle = settings.sessions;
+
+  useEffect(() => {
+    const saved = readTimerSettings();
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setSettings(saved);
+    setLeft(saved.focus * 60);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
 
   function switchTo(next: Mode) {
     setRunning(false);
     setMode(next);
-    setLeft(DURATIONS[next]);
+    setLeft(settings[next] * 60);
   }
 
   // Moves to the next step of the cycle; only a completed focus session counts toward profile stats.
@@ -69,13 +73,13 @@ export function Timer({ labels }: { labels: Labels }) {
     if (mode === "focus") {
       if (completed) {
         write(SESSIONS_KEY, String(Number(read(SESSIONS_KEY) ?? 0) + 1));
-        write(MINUTES_KEY, String(Number(read(MINUTES_KEY) ?? 0) + DURATIONS.focus / 60));
+        write(MINUTES_KEY, String(Number(read(MINUTES_KEY) ?? 0) + settings.focus));
       }
-      const next = Math.min(done + 1, CYCLE);
+      const next = Math.min(done + 1, cycle);
       setDone(next);
-      switchTo(next === CYCLE ? "longBreak" : "shortBreak");
+      switchTo(next === cycle ? "longBreak" : "shortBreak");
     } else {
-      if (done >= CYCLE) setDone(0);
+      if (done >= cycle) setDone(0);
       switchTo("focus");
     }
   }
@@ -95,10 +99,9 @@ export function Timer({ labels }: { labels: Labels }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running, mode]);
 
-  const total = DURATIONS[mode];
+  const total = settings[mode] * 60;
   const label = running ? labels.pause : left < total && left > 0 ? labels.resume : labels.start;
   const scheme = SCHEMES[mode];
-  const drained = ((total - left) / total) * 100;
 
   return (
     <section
@@ -110,7 +113,7 @@ export function Timer({ labels }: { labels: Labels }) {
         aria-hidden
         suppressHydrationWarning
         className="fixed inset-0 -z-10"
-        style={{ background: `linear-gradient(to bottom, ${scheme.top} ${drained}%, ${scheme.bottom} ${drained}%)` }}
+        style={{ background: `linear-gradient(to bottom, ${scheme.top} 50%, ${scheme.bottom} 50%)` }}
       />
 
       <div
@@ -118,7 +121,7 @@ export function Timer({ labels }: { labels: Labels }) {
         aria-label={labels.modes}
         className="flex flex-wrap justify-center gap-1 rounded-full bg-neutral-200/80 p-1 backdrop-blur"
       >
-        {(Object.keys(DURATIONS) as Mode[]).map((m) => (
+        {MODES.map((m) => (
           <button
             key={m}
             role="tab"
@@ -172,7 +175,7 @@ export function Timer({ labels }: { labels: Labels }) {
 
         <div className="flex flex-col items-center gap-2">
           <div className="flex gap-2" aria-hidden>
-            {Array.from({ length: CYCLE }, (_, i) => (
+            {Array.from({ length: cycle }, (_, i) => (
               <span
                 key={i}
                 className={`size-2.5 rounded-full border border-(--ink) ${
@@ -182,7 +185,7 @@ export function Timer({ labels }: { labels: Labels }) {
             ))}
           </div>
           <p className="text-[12px]">
-            {mode === "focus" ? fill(labels.session, Math.min(done + 1, CYCLE)) : fill(labels.sessionsDone, done)}
+            {mode === "focus" ? fill(labels.session, Math.min(done + 1, cycle), cycle) : fill(labels.sessionsDone, done, cycle)}
           </p>
         </div>
       </div>

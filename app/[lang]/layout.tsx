@@ -24,8 +24,6 @@ export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
-const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t==="moss"||t==="dusk")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
-
 export default async function RootLayout({
   children,
   params,
@@ -37,20 +35,15 @@ export default async function RootLayout({
   return (
     <html
       lang={lang}
-      data-theme="moss"
       suppressHydrationWarning
       className={`${jetbrainsMono.variable} ${archivo.variable} h-full antialiased`}
     >
-  <head>
-    <script
-      id="theme-script"
-      dangerouslySetInnerHTML={{ __html: themeScript }}
-    />
-  </head>
+      <head />
       <body className="min-h-full flex flex-col font-mono">
         <main className="flex flex-1 flex-col items-center justify-center px-4 py-12">
           {children}
         </main>
+
         <Navbar lang={lang} labels={dict.nav} />
       </body>
     </html>

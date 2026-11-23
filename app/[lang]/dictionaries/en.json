@@ -23,9 +23,13 @@
   },
   "settings": {
     "title": "Settings",
-    "background": "Background",
-    "moss": "Black, grey, green",
-    "dusk": "Black, grey, purple, pink",
+    "focus": "Focus",
+    "shortBreak": "Short break",
+    "longBreak": "Long break",
+    "sessions": "Sessions before long break",
+    "minutes": "min",
+    "decrease": "Decrease",
+    "increase": "Increase",
     "language": "Language"
   },
   "profile": {

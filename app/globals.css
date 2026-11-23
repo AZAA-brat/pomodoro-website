@@ -1,8 +1,7 @@
 @import "tailwindcss";
 
 /* Moss: black, grey, green (default) */
-:root,
-[data-theme="moss"] {
+:root {
   --bg: #000000;
   --surface: #151816;
   --line: #2a2f2c;
@@ -13,19 +12,6 @@
   --glow-1: rgba(125, 219, 163, 0.22);
   --glow-2: rgba(31, 77, 54, 0.16);
   --haze: rgba(138, 147, 141, 0.1);
-}
-
-/* Dusk: black, grey, purple, pink */
-[data-theme="dusk"] {
-  --surface: #28066d;
-  --line: #2e2a35;
-  --muted: #938c9c;
-  --text: #eee9f2;
-  --accent: #a78bfa;
-  --accent-2: #f472b6;
-  --glow-1: rgba(167, 139, 250, 0.24);
-  --glow-2: rgba(244, 114, 182, 0.16);
-  --haze: rgba(147, 140, 156, 0.1);
 }
 
 @theme inline {
