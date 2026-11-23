@@ -8,11 +8,10 @@ type Mode = "focus" | "shortBreak" | "longBreak";
 const MODES: Mode[] = ["focus", "shortBreak", "longBreak"];
 
 // Split palette: `top` and `bottom` halves of the background.
-// Focus is pure white/black with difference blending, so white ink flips to black over the white half.
-const SCHEMES: Record<Mode, { top: string; bottom: string; ink: string; blend: boolean }> = {
-  focus: { top: "#ffffff", bottom: "#7d5026", ink: "#ffffff", blend: true },
-  shortBreak: { top: "#faefd6", bottom: "#f2b33a", ink: "#151833", blend: false },
-  longBreak: { top: "#e3f5ec", bottom: "#6fd3a8", ink: "#151833", blend: false },
+const SCHEMES: Record<Mode, { top: string; bottom: string; ink: string }> = {
+  focus: { top: "#ffffffa5", bottom: "#a85b0aa5", ink: "#151833" },
+  shortBreak: { top: "#faefd6", bottom: "#f2b33a", ink: "#151833" },
+  longBreak: { top: "#e3f5ec", bottom: "#6fd3a8", ink: "#151833" },
 };
 
 type Labels = {
@@ -136,7 +135,7 @@ export function Timer({ labels }: { labels: Labels }) {
         ))}
       </div>
 
-      <div className={`flex flex-col items-center gap-8 text-(--ink) ${scheme.blend ? "mix-blend-difference" : ""}`}>
+      <div className="flex flex-col items-center gap-8 text-(--ink)">
         <p
           aria-live="off"
           suppressHydrationWarning
