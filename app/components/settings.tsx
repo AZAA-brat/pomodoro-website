@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   DEFAULT_TIMER_SETTINGS,
+  THEME_KEY,
   TIMER_SETTINGS_KEY,
   type TimerSettings,
+  read,
   readTimerSettings,
   rememberLocale,
   write,
@@ -21,7 +23,12 @@ type Labels = {
   decrease: string;
   increase: string;
   language: string;
+  theme: string;
+  dark: string;
+  light: string;
 };
+
+type Theme = "dark" | "light";
 
 const languages = [
   { code: "en", name: "ENG" },
@@ -33,11 +40,25 @@ const stepButton =
 
 export function Settings({ lang, labels }: { lang: string; labels: Labels }) {
   const [settings, setSettings] = useState(DEFAULT_TIMER_SETTINGS);
+  const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    /* eslint-disable react-hooks/set-state-in-effect */
     setSettings(readTimerSettings());
+    setTheme(read(THEME_KEY) === "light" ? "light" : "dark");
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
+
+  function changeTheme(next: Theme) {
+    setTheme(next);
+    write(THEME_KEY, next);
+    document.documentElement.setAttribute("data-theme", next);
+  }
+
+  const segment = (active: boolean) =>
+    `rounded-xl px-4 py-2 font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-accent ${
+      active ? "bg-surface text-accent" : "text-muted hover:text-text"
+    }`;
 
   const fields: { key: keyof TimerSettings; label: string; max: number; unit?: string }[] = [
     { key: "focus", label: labels.focus, max: 120, unit: labels.minutes },
@@ -97,12 +118,27 @@ export function Settings({ lang, labels }: { lang: string; labels: Labels }) {
               href={`/${l.code}/settings`}
               onClick={() => rememberLocale(l.code)}
               aria-current={lang === l.code ? "true" : undefined}
-              className={`rounded-xl px-4 py-2 font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-accent ${
-                lang === l.code ? "bg-surface text-accent" : "text-muted hover:text-text"
-              }`}
+              className={segment(lang === l.code)}
             >
               {l.name}
             </Link>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-4 text-[14px]">
+        <span id="theme-label">{labels.theme}</span>
+        <div role="group" aria-labelledby="theme-label" className="flex rounded-2xl border border-line p-1">
+          {(["dark", "light"] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => changeTheme(t)}
+              aria-pressed={theme === t}
+              className={segment(theme === t)}
+            >
+              {labels[t]}
+            </button>
           ))}
         </div>
       </div>

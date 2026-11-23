@@ -30,7 +30,10 @@
     "minutes": "мин",
     "decrease": "Уменьшить",
     "increase": "Увеличить",
-    "language": "Язык"
+    "language": "Язык",
+    "theme": "Тема",
+    "dark": "Тёмная",
+    "light": "Светлая"
   },
   "profile": {
     "title": "Профиль",

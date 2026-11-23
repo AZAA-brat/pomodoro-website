@@ -30,7 +30,10 @@
     "minutes": "min",
     "decrease": "Decrease",
     "increase": "Increase",
-    "language": "Language"
+    "language": "Language",
+    "theme": "Theme",
+    "dark": "Dark",
+    "light": "Light"
   },
   "profile": {
     "title": "Profile",

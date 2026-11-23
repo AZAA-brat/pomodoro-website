@@ -12,6 +12,22 @@
   --glow-1: rgba(125, 219, 163, 0.22);
   --glow-2: rgba(31, 77, 54, 0.16);
   --haze: rgba(138, 147, 141, 0.1);
+  color-scheme: dark;
+}
+
+/* Light: white, grey, green */
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #eef1ef;
+  --line: #d6dcd8;
+  --muted: #5c6560;
+  --text: #121513;
+  --accent: #1d7a4b;
+  --accent-2: #1d7a4b;
+  --glow-1: rgba(125, 219, 163, 0.25);
+  --glow-2: rgba(125, 219, 163, 0.12);
+  --haze: rgba(138, 147, 141, 0.08);
+  color-scheme: light;
 }
 
 @theme inline {

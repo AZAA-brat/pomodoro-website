@@ -34,7 +34,7 @@ export function Navbar({ lang, labels }: { lang: string; labels: Labels }) {
         aria-expanded={open}
         aria-controls="main-nav"
         aria-label="Menu"
-        className="fixed top-4 left-4 z-30 rounded-lg bg-neutral-900 p-2 text-2xl text-stone-300 shadow-lg hover:text-stone-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500"
+        className="fixed top-4 left-4 z-30 rounded-lg bg-surface p-2 text-2xl text-muted shadow-lg hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         <IoMdMenu suppressHydrationWarning />
       </button>
@@ -43,7 +43,7 @@ export function Navbar({ lang, labels }: { lang: string; labels: Labels }) {
 
       <nav
         id="main-nav"
-        className={`fixed inset-y-0 left-0 z-20 w-72 border-r border-white/10 bg-neutral-900 pt-20 font-sans transition-all duration-300 ${
+        className={`fixed inset-y-0 left-0 z-20 w-72 border-r border-line bg-surface pt-20 font-sans transition-all duration-300 ${
           open ? "visible translate-x-0" : "invisible -translate-x-full"
         }`}
       >
@@ -56,8 +56,8 @@ export function Navbar({ lang, labels }: { lang: string; labels: Labels }) {
                   href={item.href}
                   onClick={() => setOpen(false)}
                   aria-current={active ? "page" : undefined}
-                  className={`flex items-center gap-4 rounded-lg px-4 py-3 text-lg transition-colors focus-visible:outline-2 focus-visible:outline-cyan-500 ${
-                    active ? "bg-white/5 text-stone-100" : "text-stone-400 hover:text-stone-100"
+                  className={`flex items-center gap-4 rounded-lg px-4 py-3 text-lg transition-colors focus-visible:outline-2 focus-visible:outline-accent ${
+                    active ? "bg-bg/60 text-text" : "text-muted hover:text-text"
                   }`}
                 >
                   <span className="text-xl" aria-hidden>

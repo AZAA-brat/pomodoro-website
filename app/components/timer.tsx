@@ -1,18 +1,22 @@
 "use client";
 
 import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { MdPause, MdPlayArrow } from "react-icons/md";
 import { DEFAULT_TIMER_SETTINGS, MINUTES_KEY, SESSIONS_KEY, read, readTimerSettings, write } from "../lib/storage";
 
 type Mode = "focus" | "shortBreak" | "longBreak";
 
 const MODES: Mode[] = ["focus", "shortBreak", "longBreak"];
 
-// Split palette: `top` and `bottom` halves of the background.
-const SCHEMES: Record<Mode, { top: string; bottom: string; ink: string }> = {
-  focus: { top: "#ffffffa5", bottom: "#a85b0aa5", ink: "#151833" },
-  shortBreak: { top: "#faefd6", bottom: "#f2b33a", ink: "#151833" },
-  longBreak: { top: "#e3f5ec", bottom: "#6fd3a8", ink: "#151833" },
+// Ring colour per mode; `ink` is the text/icon colour on top of it.
+const SCHEMES: Record<Mode, { color: string; ink: string }> = {
+  focus: { color: "#a85b0a", ink: "#ffffff" },
+  shortBreak: { color: "#f2b33a", ink: "#151833" },
+  longBreak: { color: "#6fd3a8", ink: "#151833" },
 };
+
+const RADIUS = 90;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 type Labels = {
   focus: string;
@@ -41,7 +45,7 @@ function fill(template: string, n: number, total: number) {
 }
 
 const outlined =
-  "rounded-full border border-(--ink) bg-(--water) px-5 py-2.5 text-[14px] text-(--ink) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--ink)";
+  "rounded-full border border-line px-5 py-2.5 text-[14px] text-text transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--mode)";
 
 export function Timer({ labels }: { labels: Labels }) {
   const [settings, setSettings] = useState(DEFAULT_TIMER_SETTINGS);
@@ -101,24 +105,20 @@ export function Timer({ labels }: { labels: Labels }) {
   const total = settings[mode] * 60;
   const label = running ? labels.pause : left < total && left > 0 ? labels.resume : labels.start;
   const scheme = SCHEMES[mode];
+  const remaining = total > 0 ? left / total : 0;
+  // Knob sits at the end of the remaining arc, measured clockwise from 12 o'clock.
+  const angle = remaining * 2 * Math.PI;
 
   return (
     <section
       suppressHydrationWarning
-      className="flex w-full flex-col items-center gap-8 font-display"
-      style={{ "--ink": scheme.ink, "--water": scheme.bottom } as CSSProperties}
+      className="flex w-full flex-col items-center gap-8 font-display text-text"
+      style={{ "--mode": scheme.color, "--mode-ink": scheme.ink } as CSSProperties}
     >
-      <div
-        aria-hidden
-        suppressHydrationWarning
-        className="fixed inset-0 -z-10"
-        style={{ background: `linear-gradient(to bottom, ${scheme.top} 50%, ${scheme.bottom} 50%)` }}
-      />
-
       <div
         role="tablist"
         aria-label={labels.modes}
-        className="flex flex-wrap justify-center gap-1 rounded-full bg-neutral-200/80 p-1 backdrop-blur"
+        className="flex flex-wrap justify-center gap-1 rounded-full border border-line bg-surface p-1"
       >
         {MODES.map((m) => (
           <button
@@ -126,8 +126,8 @@ export function Timer({ labels }: { labels: Labels }) {
             role="tab"
             aria-selected={mode === m}
             onClick={() => switchTo(m)}
-            className={`rounded-full px-4 py-1.5 text-[13px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#151833] ${
-              mode === m ? "bg-[#151833] text-white" : "text-[#151833]/70 hover:text-[#151833]"
+            className={`rounded-full px-4 py-1.5 text-[13px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--mode) ${
+              mode === m ? "bg-(--mode) text-(--mode-ink)" : "text-muted hover:text-text"
             }`}
           >
             {labels[m]}
@@ -135,58 +135,84 @@ export function Timer({ labels }: { labels: Labels }) {
         ))}
       </div>
 
-      <div className="flex flex-col items-center gap-8 text-(--ink)">
-        <p
-          aria-live="off"
-          suppressHydrationWarning
-          className="select-none text-[clamp(6rem,26vw,17rem)] leading-[0.85] font-black tracking-[-0.06em] tabular-nums"
-        >
-          {format(left)}
-        </p>
-
-        {mode === "focus" ? (
-          <input
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-            aria-label={labels.task}
-            placeholder={labels.taskPlaceholder}
-            suppressHydrationWarning
-            className="w-72 max-w-full border-b border-(--ink)/60 bg-transparent pb-2 text-center text-lg placeholder:text-(--ink)/50 focus-visible:border-(--ink) focus-visible:outline-none"
+      <div className="relative aspect-square w-full max-w-sm">
+        <svg viewBox="0 0 200 200" className="size-full" aria-hidden>
+          <circle cx="100" cy="100" r={RADIUS} fill="none" strokeWidth="8" className="stroke-line" />
+          <circle
+            cx="100"
+            cy="100"
+            r={RADIUS}
+            fill="none"
+            stroke={scheme.color}
+            strokeWidth="8"
+            strokeLinecap="round"
+            strokeDasharray={CIRCUMFERENCE}
+            strokeDashoffset={CIRCUMFERENCE * (1 - remaining)}
+            transform="rotate(-90 100 100)"
           />
-        ) : (
-          <p className="text-lg">{mode === "shortBreak" ? labels.shortBreakMessage : labels.longBreakMessage}</p>
-        )}
+          <circle
+            cx={100 + RADIUS * Math.sin(angle)}
+            cy={100 - RADIUS * Math.cos(angle)}
+            r="7"
+            fill={scheme.color}
+            strokeWidth="3"
+            className="stroke-bg"
+          />
+        </svg>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setRunning((r) => !r)}
-            className="min-w-28 rounded-full bg-(--ink) px-8 py-2.5 text-[14px] text-(--water) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--ink)"
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-12 text-center">
+          {mode === "focus" ? (
+            <input
+              value={task}
+              onChange={(e) => setTask(e.target.value)}
+              aria-label={labels.task}
+              placeholder={labels.taskPlaceholder}
+              suppressHydrationWarning
+              className="w-full max-w-56 rounded-full border border-line bg-surface px-4 py-1.5 text-center text-[13px] placeholder:text-muted focus-visible:border-(--mode) focus-visible:outline-none"
+            />
+          ) : (
+            <p className="max-w-56 text-[13px] text-muted">
+              {mode === "shortBreak" ? labels.shortBreakMessage : labels.longBreakMessage}
+            </p>
+          )}
+          <p className="text-[13px] tracking-widest text-muted uppercase">{labels[mode]}</p>
+          <p
+            aria-live="off"
+            suppressHydrationWarning
+            className="select-none text-6xl leading-none font-black tracking-tight tabular-nums sm:text-7xl"
           >
-            {label}
-          </button>
-          <button onClick={() => switchTo(mode)} className={outlined}>
-            {labels.reset}
-          </button>
-          <button onClick={() => advance(false)} className={outlined}>
-            {labels.skip}
-          </button>
-        </div>
-
-        <div className="flex flex-col items-center gap-2">
+            {format(left)}
+          </p>
+          <p className="text-[12px] text-muted">
+            {mode === "focus" ? fill(labels.session, Math.min(done + 1, cycle), cycle) : fill(labels.sessionsDone, done, cycle)}
+          </p>
           <div className="flex gap-2" aria-hidden>
             {Array.from({ length: cycle }, (_, i) => (
               <span
                 key={i}
-                className={`size-2.5 rounded-full border border-(--ink) ${
-                  i < done ? "bg-(--ink)" : i === done && mode === "focus" ? "bg-(--ink)/50" : ""
+                className={`size-2 rounded-full border border-(--mode) ${
+                  i < done ? "bg-(--mode)" : i === done && mode === "focus" ? "bg-(--mode)/50" : ""
                 }`}
               />
             ))}
           </div>
-          <p className="text-[12px]">
-            {mode === "focus" ? fill(labels.session, Math.min(done + 1, cycle), cycle) : fill(labels.sessionsDone, done, cycle)}
-          </p>
         </div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <button onClick={() => switchTo(mode)} className={outlined}>
+          {labels.reset}
+        </button>
+        <button
+          onClick={() => setRunning((r) => !r)}
+          aria-label={label}
+          className="flex size-16 items-center justify-center rounded-full bg-(--mode) text-4xl text-(--mode-ink) shadow-lg transition-transform active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--mode)"
+        >
+          {running ? <MdPause suppressHydrationWarning /> : <MdPlayArrow suppressHydrationWarning />}
+        </button>
+        <button onClick={() => advance(false)} className={outlined}>
+          {labels.skip}
+        </button>
       </div>
     </section>
   );

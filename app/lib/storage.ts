@@ -2,6 +2,7 @@ export const NAME_KEY = "profile-name";
 export const SESSIONS_KEY = "focus-sessions";
 export const MINUTES_KEY = "focus-minutes";
 export const TIMER_SETTINGS_KEY = "timer-settings";
+export const THEME_KEY = "theme";
 
 // Durations in minutes; `sessions` is focus sessions before a long break.
 export type TimerSettings = { focus: number; shortBreak: number; longBreak: number; sessions: number };
