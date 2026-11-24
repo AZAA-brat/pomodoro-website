@@ -60,11 +60,11 @@ export function Settings({ lang, labels }: { lang: string; labels: Labels }) {
       active ? "bg-surface text-accent" : "text-muted hover:text-text"
     }`;
 
-  const fields: { key: keyof TimerSettings; label: string; max: number; unit?: string }[] = [
-    { key: "focus", label: labels.focus, max: 120, unit: labels.minutes },
-    { key: "shortBreak", label: labels.shortBreak, max: 60, unit: labels.minutes },
-    { key: "longBreak", label: labels.longBreak, max: 60, unit: labels.minutes },
-    { key: "sessions", label: labels.sessions, max: 12 },
+  const fields: { key: keyof TimerSettings; label: string; max: number; step: number; unit?: string }[] = [
+    { key: "focus", label: labels.focus, max: 120, step: 5, unit: labels.minutes },
+    { key: "shortBreak", label: labels.shortBreak, max: 60, step: 5, unit: labels.minutes },
+    { key: "longBreak", label: labels.longBreak, max: 60, step: 5, unit: labels.minutes },
+    { key: "sessions", label: labels.sessions, max: 12, step: 1 },
   ];
 
   function change(key: keyof TimerSettings, value: number) {
@@ -78,14 +78,14 @@ export function Settings({ lang, labels }: { lang: string; labels: Labels }) {
       <h1 className="text-2xl font-semibold">{labels.title}</h1>
 
       <ul className="flex flex-col gap-6">
-        {fields.map(({ key, label, max, unit }) => (
+        {fields.map(({ key, label, max, step, unit }) => (
           <li key={key} className="flex items-center justify-between gap-4 text-[14px]">
             <span>{label}</span>
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => change(key, settings[key] - 1)}
-                disabled={settings[key] <= 1}
+                onClick={() => change(key, Math.max(step, settings[key] - step))}
+                disabled={settings[key] <= step}
                 aria-label={`${labels.decrease}: ${label}`}
                 className={stepButton}
               >
@@ -97,7 +97,7 @@ export function Settings({ lang, labels }: { lang: string; labels: Labels }) {
               </output>
               <button
                 type="button"
-                onClick={() => change(key, settings[key] + 1)}
+                onClick={() => change(key, Math.min(max, settings[key] + step))}
                 disabled={settings[key] >= max}
                 aria-label={`${labels.increase}: ${label}`}
                 className={stepButton}

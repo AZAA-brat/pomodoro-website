@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* Moss: black, grey, green (default) */
 :root {
   --bg: #000000;
   --surface: #151816;
@@ -9,24 +8,17 @@
   --text: #e8ede9;
   --accent: #7ddba3;
   --accent-2: #7ddba3;
-  --glow-1: rgba(125, 219, 163, 0.22);
-  --glow-2: rgba(31, 77, 54, 0.16);
-  --haze: rgba(138, 147, 141, 0.1);
   color-scheme: dark;
 }
 
-/* Light: white, grey, green */
 :root[data-theme="light"] {
-  --bg: #ffffff;
+  --bg: #ffffff73;
   --surface: #eef1ef;
   --line: #d6dcd8;
   --muted: #5c6560;
   --text: #121513;
   --accent: #1d7a4b;
   --accent-2: #1d7a4b;
-  --glow-1: rgba(125, 219, 163, 0.25);
-  --glow-2: rgba(125, 219, 163, 0.12);
-  --haze: rgba(138, 147, 141, 0.08);
   color-scheme: light;
 }
 
@@ -44,11 +36,6 @@
 
 body {
   background-color: var(--bg);
-  background-image:
-    radial-gradient(ellipse 70% 55% at 30% 115%, var(--glow-1) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 55% at 75% 115%, var(--glow-2) 0%, transparent 65%),
-    radial-gradient(ellipse 90% 55% at 50% 48%, var(--haze) 0%, transparent 68%);
-  background-attachment: fixed;
   color: var(--text);
 }
 

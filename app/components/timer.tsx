@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { MdPause, MdPlayArrow } from "react-icons/md";
 import { DEFAULT_TIMER_SETTINGS, MINUTES_KEY, SESSIONS_KEY, read, readTimerSettings, write } from "../lib/storage";
@@ -37,7 +38,11 @@ type Labels = {
 };
 
 function format(seconds: number) {
-  return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, "0")}`;
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
 
 function fill(template: string, n: number, total: number) {
@@ -47,7 +52,9 @@ function fill(template: string, n: number, total: number) {
 const outlined =
   "rounded-full border border-line px-5 py-2.5 text-[14px] text-text transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--mode)";
 
-export function Timer({ labels }: { labels: Labels }) {
+// Lives in the layout so it keeps running on other pages; only shown on the timer page.
+export function Timer({ lang, labels }: { lang: string; labels: Labels }) {
+  const visible = usePathname() === `/${lang}`;
   const [settings, setSettings] = useState(DEFAULT_TIMER_SETTINGS);
   const [mode, setMode] = useState<Mode>("focus");
   const [left, setLeft] = useState(DEFAULT_TIMER_SETTINGS.focus * 60);
@@ -57,13 +64,16 @@ export function Timer({ labels }: { labels: Labels }) {
   const endAt = useRef(0);
   const cycle = settings.sessions;
 
+  // Re-reads settings each time the timer page is shown; an untouched, paused timer picks up the new duration.
   useEffect(() => {
+    if (!visible) return;
     const saved = readTimerSettings();
     /* eslint-disable react-hooks/set-state-in-effect */
     setSettings(saved);
-    setLeft(saved.focus * 60);
+    if (!running && left === settings[mode] * 60) setLeft(saved[mode] * 60);
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
   function switchTo(next: Mode) {
     setRunning(false);
@@ -100,18 +110,19 @@ export function Timer({ labels }: { labels: Labels }) {
     }, 250);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [running, mode]);
+  }, [running, mode, settings]);
 
   const total = settings[mode] * 60;
   const label = running ? labels.pause : left < total && left > 0 ? labels.resume : labels.start;
   const scheme = SCHEMES[mode];
-  const remaining = total > 0 ? left / total : 0;
-  // Knob sits at the end of the remaining arc, measured clockwise from 12 o'clock.
-  const angle = remaining * 2 * Math.PI;
+  const remaining = total > 0 ? Math.min(1, left / total) : 0;
+  // Knob moves clockwise from 12 o'clock as time elapses; the remaining arc runs from the knob back to 12.
+  const angle = (1 - remaining) * 2 * Math.PI;
 
   return (
     <section
       suppressHydrationWarning
+      hidden={!visible}
       className="flex w-full flex-col items-center gap-8 font-display text-text"
       style={{ "--mode": scheme.color, "--mode-ink": scheme.ink } as CSSProperties}
     >
@@ -147,7 +158,7 @@ export function Timer({ labels }: { labels: Labels }) {
             strokeWidth="8"
             strokeLinecap="round"
             strokeDasharray={CIRCUMFERENCE}
-            strokeDashoffset={CIRCUMFERENCE * (1 - remaining)}
+            strokeDashoffset={-CIRCUMFERENCE * (1 - remaining)}
             transform="rotate(-90 100 100)"
           />
           <circle

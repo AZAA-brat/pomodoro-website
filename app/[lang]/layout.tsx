@@ -3,7 +3,8 @@ import { Archivo, JetBrains_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { getDictionary, hasLocale, locales } from "./dictionaries";
 import { Navbar } from "../components/navbar";
-import { THEME_KEY } from "../lib/storage";
+import { Timer } from "../components/timer";
+import { ThemeScript } from "../components/theme-script";
 import "../globals.css";
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
@@ -41,14 +42,11 @@ export default async function RootLayout({
     >
       <head>
         {/* Applies the saved theme before paint so light mode doesn't flash dark. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{document.documentElement.dataset.theme=localStorage.getItem("${THEME_KEY}")||"dark"}catch(e){}`,
-          }}
-        />
+        <ThemeScript />
       </head>
       <body className="min-h-full flex flex-col font-mono">
         <main className="flex flex-1 flex-col items-center justify-center px-4 py-12">
+          <Timer lang={lang} labels={dict.timer} />
           {children}
         </main>
 
