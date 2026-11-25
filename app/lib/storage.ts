@@ -39,3 +39,22 @@ export function readTimerSettings(): TimerSettings {
     return DEFAULT_TIMER_SETTINGS;
   }
 }
+
+export const FOCUS_LOG_KEY = "focus-log";
+
+// One entry per completed focus session; `at` is the completion time in ms.
+export type FocusEntry = { at: number; minutes: number; task: string };
+
+export function readFocusLog(): FocusEntry[] {
+  try {
+    const log = JSON.parse(read(FOCUS_LOG_KEY) ?? "[]");
+    return Array.isArray(log) ? log : [];
+  } catch {
+    return [];
+  }
+}
+
+// shortcut: whole log kept in one localStorage value (~60 bytes/session), move to IndexedDB if it nears the 5MB quota.
+export function logFocus(entry: FocusEntry) {
+  write(FOCUS_LOG_KEY, JSON.stringify([...readFocusLog(), entry]));
+}

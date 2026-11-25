@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Stats } from "./stats";
 import { MINUTES_KEY, NAME_KEY, SESSIONS_KEY, read, write } from "../lib/storage";
 
 type Labels = {
@@ -9,9 +10,10 @@ type Labels = {
   namePlaceholder: string;
   sessions: string;
   minutes: string;
+  stats: Parameters<typeof Stats>[0]["labels"];
 };
 
-export function Profile({ labels }: { labels: Labels }) {
+export function Profile({ lang, labels }: { lang: string; labels: Labels }) {
   const [name, setName] = useState("");
   const [sessions, setSessions] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -52,6 +54,8 @@ export function Profile({ labels }: { labels: Labels }) {
           </div>
         ))}
       </dl>
+
+      <Stats lang={lang} labels={labels.stats} />
     </section>
   );
 }
