@@ -7,5 +7,5 @@ export default async function Page({ params }: PageProps<"/[lang]/profile">) {
   if (!hasLocale(lang)) notFound();
   const dict = await getDictionary(lang);
 
-  return <Profile labels={dict.profile} />;
+  return <Profile lang={lang} labels={dict.profile} />;
 }

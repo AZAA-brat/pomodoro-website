@@ -3,7 +3,15 @@
 import { usePathname } from "next/navigation";
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { MdPause, MdPlayArrow } from "react-icons/md";
-import { DEFAULT_TIMER_SETTINGS, MINUTES_KEY, SESSIONS_KEY, read, readTimerSettings, write } from "../lib/storage";
+import {
+  DEFAULT_TIMER_SETTINGS,
+  MINUTES_KEY,
+  SESSIONS_KEY,
+  logFocus,
+  read,
+  readTimerSettings,
+  write,
+} from "../lib/storage";
 
 type Mode = "focus" | "shortBreak" | "longBreak";
 
@@ -62,6 +70,7 @@ export function Timer({ lang, labels }: { lang: string; labels: Labels }) {
   const [done, setDone] = useState(0); // focus sessions finished in the current cycle
   const [task, setTask] = useState("");
   const endAt = useRef(0);
+  const taskRef = useRef(""); // read by the interval's stale `advance` closure when a session completes
   const cycle = settings.sessions;
 
   // Re-reads settings each time the timer page is shown; an untouched, paused timer picks up the new duration.
@@ -87,6 +96,7 @@ export function Timer({ lang, labels }: { lang: string; labels: Labels }) {
       if (completed) {
         write(SESSIONS_KEY, String(Number(read(SESSIONS_KEY) ?? 0) + 1));
         write(MINUTES_KEY, String(Number(read(MINUTES_KEY) ?? 0) + settings.focus));
+        logFocus({ at: Date.now(), minutes: settings.focus, task: taskRef.current.trim() });
       }
       const next = Math.min(done + 1, cycle);
       setDone(next);
@@ -175,7 +185,10 @@ export function Timer({ lang, labels }: { lang: string; labels: Labels }) {
           {mode === "focus" ? (
             <input
               value={task}
-              onChange={(e) => setTask(e.target.value)}
+              onChange={(e) => {
+                setTask(e.target.value);
+                taskRef.current = e.target.value;
+              }}
               aria-label={labels.task}
               placeholder={labels.taskPlaceholder}
               suppressHydrationWarning

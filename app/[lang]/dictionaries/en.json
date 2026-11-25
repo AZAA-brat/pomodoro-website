@@ -40,6 +40,22 @@
     "name": "Your name",
     "namePlaceholder": "Add your name",
     "sessions": "Focus sessions completed",
-    "minutes": "Minutes focused"
-  }
+    "minutes": "Minutes focused",
+    "stats": {
+      "title": "Insights",
+      "periods": "Period",
+      "day": "Day",
+      "week": "Week",
+      "weeks8": "8 Weeks",
+      "month": "Month",
+      "year": "Year",
+      "previous": "Previous",
+      "next": "Next",
+      "perDay": "day",
+      "noTask": "No task",
+      "other": "Other",
+      "empty": "No focus sessions yet"
+    }
+  },
+  "darkReaderWarning": "Dark Reader is on. It changes this site's colours — turn it off here and use the built-in Dark theme in Settings."
 }

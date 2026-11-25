@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo, JetBrains_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { getDictionary, hasLocale, locales } from "./dictionaries";
+import { DarkReaderWarning } from "../components/dark-reader-warning";
 import { Navbar } from "../components/navbar";
 import { Timer } from "../components/timer";
 import { ThemeScript } from "../components/theme-script";
@@ -51,6 +52,7 @@ export default async function RootLayout({
         </main>
 
         <Navbar lang={lang} labels={dict.nav} />
+        <DarkReaderWarning message={dict.darkReaderWarning} />
       </body>
     </html>
   );
