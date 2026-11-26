@@ -3,6 +3,7 @@ import { Archivo, JetBrains_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { getDictionary, hasLocale, locales } from "./dictionaries";
 import { DarkReaderWarning } from "../components/dark-reader-warning";
+import { LoadingScreen } from "../components/loading-screen";
 import { Navbar } from "../components/navbar";
 import { Timer } from "../components/timer";
 import { ThemeScript } from "../components/theme-script";
@@ -46,6 +47,7 @@ export default async function RootLayout({
         <ThemeScript />
       </head>
       <body className="min-h-full flex flex-col font-mono">
+        <LoadingScreen labels={dict.loading} />
         <main className="flex flex-1 flex-col items-center justify-center px-4 py-12">
           <Timer lang={lang} labels={dict.timer} />
           {children}

@@ -57,5 +57,11 @@
       "empty": "No focus sessions yet"
     }
   },
-  "darkReaderWarning": "Dark Reader is on. It changes this site's colours — turn it off here and use the built-in Dark theme in Settings."
+  "darkReaderWarning": "Dark Reader is on. It changes this site's colours — turn it off here and use the built-in Dark theme in Settings.",
+  "loading": {
+    "start": "Setting up your workspace...",
+    "half": "Almost...",
+    "done": "Workspace is set!",
+    "skip": "Press any key to skip"
+  }
 }
