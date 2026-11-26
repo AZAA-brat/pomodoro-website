@@ -1,4 +1,3 @@
-export const NAME_KEY = "profile-name";
 export const SESSIONS_KEY = "focus-sessions";
 export const MINUTES_KEY = "focus-minutes";
 export const TIMER_SETTINGS_KEY = "timer-settings";

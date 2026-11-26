@@ -37,8 +37,7 @@
   },
   "profile": {
     "title": "Профиль",
-    "name": "Ваше имя",
-    "namePlaceholder": "Добавьте имя",
+    "greeting": "Привет! Азиз",
     "sessions": "Завершённых сессий фокуса",
     "minutes": "Минут в фокусе",
     "stats": {

@@ -37,8 +37,7 @@
   },
   "profile": {
     "title": "Profile",
-    "name": "Your name",
-    "namePlaceholder": "Add your name",
+    "greeting": "Hi! Aziz",
     "sessions": "Focus sessions completed",
     "minutes": "Minutes focused",
     "stats": {
