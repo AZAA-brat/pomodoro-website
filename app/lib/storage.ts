@@ -57,3 +57,26 @@ export function readFocusLog(): FocusEntry[] {
 export function logFocus(entry: FocusEntry) {
   write(FOCUS_LOG_KEY, JSON.stringify([...readFocusLog(), entry]));
 }
+
+export const PROJECTS_KEY = "projects";
+
+// `goal` is the daily focus goal in hours; focus sessions log the project name as their task.
+export type Project = { name: string; goal: number; color: string };
+
+// Default colours handed to new projects in turn; any hex colour can be picked after.
+export const PROJECT_COLORS = ["#e5675a", "#f2b33a", "#6fd3a8", "#5aa9e6", "#b38ce0", "#e58fc1"];
+
+export function readProjects(): Project[] {
+  try {
+    const projects = JSON.parse(read(PROJECTS_KEY) ?? "[]");
+    if (!Array.isArray(projects)) return [];
+    // Projects saved before colours existed get a default one.
+    return projects.map((p, i) => ({ ...p, color: p.color ?? PROJECT_COLORS[i % PROJECT_COLORS.length] }));
+  } catch {
+    return [];
+  }
+}
+
+export function writeProjects(projects: Project[]) {
+  write(PROJECTS_KEY, JSON.stringify(projects));
+}

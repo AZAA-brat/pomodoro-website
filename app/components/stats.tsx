@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
-import { type FocusEntry, readFocusLog } from "../lib/storage";
+import { type FocusEntry, readFocusLog, readProjects } from "../lib/storage";
 import {
   type Bucket,
   type Period,
@@ -42,6 +42,7 @@ const navButton =
 
 export function Stats({ lang, labels }: { lang: string; labels: Labels }) {
   const [log, setLog] = useState<FocusEntry[]>([]);
+  const [projectColors, setProjectColors] = useState<Record<string, string>>({});
   // Set after mount so dates use the visitor's clock and timezone, not the server's.
   const [now, setNow] = useState<Date | null>(null);
   const [period, setPeriod] = useState<Period>("day");
@@ -50,6 +51,7 @@ export function Stats({ lang, labels }: { lang: string; labels: Labels }) {
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     setLog(readFocusLog());
+    setProjectColors(Object.fromEntries(readProjects().map((p) => [p.name, p.color])));
     setNow(new Date());
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
@@ -111,6 +113,7 @@ export function Stats({ lang, labels }: { lang: string; labels: Labels }) {
             <TaskBreakdown
               tasks={minutesByTask(log, range.start, range.end)}
               total={total}
+              projectColors={projectColors}
               lang={lang}
               labels={labels}
             />
@@ -167,22 +170,25 @@ function BarChart({ bars, lang }: { bars: { bucket: Bucket; minutes: number }[];
 function TaskBreakdown({
   tasks,
   total,
+  projectColors,
   lang,
   labels,
 }: {
   tasks: { task: string; minutes: number }[];
   total: number;
+  projectColors: Record<string, string>;
   lang: string;
   labels: Labels;
 }) {
   // Top five tasks get their own slice; the rest are grouped.
   const rest = tasks.slice(5).reduce((sum, t) => sum + t.minutes, 0);
   const slices = [
-    ...tasks.slice(0, 5).map((t) => ({ name: t.task || labels.noTask, minutes: t.minutes })),
-    ...(rest > 0 ? [{ name: labels.other, minutes: rest }] : []),
+    ...tasks.slice(0, 5).map((t) => ({ name: t.task || labels.noTask, minutes: t.minutes, color: projectColors[t.task] })),
+    ...(rest > 0 ? [{ name: labels.other, minutes: rest, color: undefined }] : []),
   ].map((s, i, all) => ({
     ...s,
-    color: SLICE_COLORS[rest > 0 && i === all.length - 1 ? SLICE_COLORS.length - 1 : i],
+    // Projects use their own colour; other tasks fall back to the slice palette.
+    color: s.color ?? SLICE_COLORS[rest > 0 && i === all.length - 1 ? SLICE_COLORS.length - 1 : i],
     before: all.slice(0, i).reduce((sum, p) => sum + p.minutes, 0),
   }));
 
