@@ -11,7 +11,6 @@ import {
   logFocus,
   read,
   readProjects,
-  readTimerSettings,
   write,
 } from "../lib/storage";
 
@@ -65,7 +64,6 @@ const outlined =
 // Lives in the layout so it keeps running on other pages; only shown on the timer page.
 export function Timer({ lang, labels }: { lang: string; labels: Labels }) {
   const visible = usePathname() === `/${lang}`;
-  const [settings, setSettings] = useState(DEFAULT_TIMER_SETTINGS);
   const [mode, setMode] = useState<Mode>("focus");
   const [left, setLeft] = useState(DEFAULT_TIMER_SETTINGS.focus * 60);
   const [running, setRunning] = useState(false);
@@ -74,18 +72,20 @@ export function Timer({ lang, labels }: { lang: string; labels: Labels }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const endAt = useRef(0);
   const taskRef = useRef(""); // read by the interval's stale `advance` closure when a session completes
+  // Durations come from the selected project; without projects the defaults apply.
+  const settings = projects.find((p) => p.name === task) ?? DEFAULT_TIMER_SETTINGS;
   const cycle = settings.sessions;
 
-  // Re-reads settings each time the timer page is shown; an untouched, paused timer picks up the new duration.
+  // Re-reads projects each time the timer page is shown; an untouched, paused timer picks up the new duration.
   useEffect(() => {
     if (!visible) return;
-    const saved = readTimerSettings();
-    const savedProjects = readProjects();
+    const saved = readProjects();
+    const current = saved.find((p) => p.name === taskRef.current) ?? saved[0];
     /* eslint-disable react-hooks/set-state-in-effect */
-    setSettings(saved);
-    setProjects(savedProjects);
-    if (savedProjects.length && !savedProjects.some((p) => p.name === taskRef.current)) chooseTask(savedProjects[0].name);
-    if (!running && left === settings[mode] * 60) setLeft(saved[mode] * 60);
+    setProjects(saved);
+    if (current) chooseTask(current.name);
+    else if (projects.some((p) => p.name === taskRef.current)) chooseTask(""); // its project was deleted
+    if (!running && left === settings[mode] * 60) setLeft((current ?? DEFAULT_TIMER_SETTINGS)[mode] * 60);
     /* eslint-enable react-hooks/set-state-in-effect */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
@@ -196,9 +196,13 @@ export function Timer({ lang, labels }: { lang: string; labels: Labels }) {
           {mode === "focus" && projects.length > 0 ? (
             <select
               value={task}
-              onChange={(e) => chooseTask(e.target.value)}
+              onChange={(e) => {
+                chooseTask(e.target.value);
+                setLeft(projects.find((p) => p.name === e.target.value)![mode] * 60);
+              }}
+              disabled={running}
               aria-label={labels.task}
-              className="w-full max-w-56 rounded-full border border-line bg-surface px-4 py-1.5 text-center text-[13px] focus-visible:border-(--mode) focus-visible:outline-none"
+              className="w-full max-w-56 rounded-full border border-line bg-surface px-4 py-1.5 text-center text-[13px] focus-visible:border-(--mode) focus-visible:outline-none disabled:opacity-60"
             >
               {projects.map((p) => (
                 <option key={p.name} value={p.name}>

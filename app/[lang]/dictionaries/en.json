@@ -2,8 +2,11 @@
   "nav": {
     "timer": "Timer",
     "projects": "Projects",
-    "settings": "Settings",
     "profile": "Profile"
+  },
+  "toolbar": {
+    "language": "Language",
+    "darkTheme": "Dark theme"
   },
   "timer": {
     "focus": "Focus",
@@ -28,25 +31,21 @@
     "namePlaceholder": "e.g. Learning Python",
     "goal": "Daily goal",
     "hours": "h",
-    "add": "Add project",
     "delete": "Delete project",
     "today": "Today",
-    "empty": "No projects yet. Add one to pick it on the timer.",
-    "color": "Project colour"
-  },
-  "settings": {
-    "title": "Settings",
+    "empty": "No projects yet. Create one to pick it on the timer.",
+    "color": "Project colour",
+    "create": "Create project",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit project",
     "focus": "Focus",
     "shortBreak": "Short break",
     "longBreak": "Long break",
     "sessions": "Sessions before long break",
     "minutes": "min",
     "decrease": "Decrease",
-    "increase": "Increase",
-    "language": "Language",
-    "theme": "Theme",
-    "dark": "Dark",
-    "light": "Light"
+    "increase": "Increase"
   },
   "profile": {
     "title": "Profile",
@@ -69,7 +68,7 @@
       "empty": "No focus sessions yet"
     }
   },
-  "darkReaderWarning": "Dark Reader is on. It changes this site's colours — turn it off here and use the built-in Dark theme in Settings.",
+  "darkReaderWarning": "Dark Reader is on. It changes this site's colours — turn it off here and use the built-in Dark theme (top right).",
   "loading": {
     "start": "Setting up your workspace...",
     "half": "Almost...",

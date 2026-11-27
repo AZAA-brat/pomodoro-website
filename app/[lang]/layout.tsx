@@ -7,6 +7,7 @@ import { LoadingScreen } from "../components/loading-screen";
 import { Navbar } from "../components/navbar";
 import { Timer } from "../components/timer";
 import { ThemeScript } from "../components/theme-script";
+import { Toolbar } from "../components/toolbar";
 import "../globals.css";
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
@@ -54,6 +55,7 @@ export default async function RootLayout({
         </main>
 
         <Navbar lang={lang} labels={dict.nav} />
+        <Toolbar lang={lang} labels={dict.toolbar} />
         <DarkReaderWarning message={dict.darkReaderWarning} />
       </body>
     </html>
