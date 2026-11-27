@@ -6,8 +6,9 @@ import { usePathname } from "next/navigation";
 import { MdOutlineTimer } from "react-icons/md";
 import { IoMdMenu, IoMdSettings } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
+import { BiCategory } from "react-icons/bi";
 
-type Labels = { timer: string; settings: string; profile: string };
+type Labels = { timer: string; projects: string; settings: string; profile: string };
 
 export function Navbar({ lang, labels }: { lang: string; labels: Labels }) {
   const pathname = usePathname();
@@ -22,6 +23,7 @@ export function Navbar({ lang, labels }: { lang: string; labels: Labels }) {
 
   const items = [
     { href: `/${lang}`, label: labels.timer, icon: <MdOutlineTimer suppressHydrationWarning /> },
+    { href: `/${lang}/projects`, label: labels.projects, icon: <BiCategory suppressHydrationWarning /> },
     { href: `/${lang}/settings`, label: labels.settings, icon: <IoMdSettings suppressHydrationWarning /> },
     { href: `/${lang}/profile`, label: labels.profile, icon: <CgProfile suppressHydrationWarning /> },
   ];

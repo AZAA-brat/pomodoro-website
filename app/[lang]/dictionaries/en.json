@@ -1,6 +1,7 @@
 {
   "nav": {
     "timer": "Timer",
+    "projects": "Projects",
     "settings": "Settings",
     "profile": "Profile"
   },
@@ -20,6 +21,18 @@
     "longBreakMessage": "Take a longer rest. You earned it.",
     "session": "Session {n} of {total}",
     "sessionsDone": "{n} of {total} sessions done"
+  },
+  "projects": {
+    "title": "Projects",
+    "name": "Project",
+    "namePlaceholder": "e.g. Learning Python",
+    "goal": "Daily goal",
+    "hours": "h",
+    "add": "Add project",
+    "delete": "Delete project",
+    "today": "Today",
+    "empty": "No projects yet. Add one to pick it on the timer.",
+    "color": "Project colour"
   },
   "settings": {
     "title": "Settings",

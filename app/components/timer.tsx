@@ -7,8 +7,10 @@ import {
   DEFAULT_TIMER_SETTINGS,
   MINUTES_KEY,
   SESSIONS_KEY,
+  type Project,
   logFocus,
   read,
+  readProjects,
   readTimerSettings,
   write,
 } from "../lib/storage";
@@ -69,6 +71,7 @@ export function Timer({ lang, labels }: { lang: string; labels: Labels }) {
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(0); // focus sessions finished in the current cycle
   const [task, setTask] = useState("");
+  const [projects, setProjects] = useState<Project[]>([]);
   const endAt = useRef(0);
   const taskRef = useRef(""); // read by the interval's stale `advance` closure when a session completes
   const cycle = settings.sessions;
@@ -77,12 +80,20 @@ export function Timer({ lang, labels }: { lang: string; labels: Labels }) {
   useEffect(() => {
     if (!visible) return;
     const saved = readTimerSettings();
+    const savedProjects = readProjects();
     /* eslint-disable react-hooks/set-state-in-effect */
     setSettings(saved);
+    setProjects(savedProjects);
+    if (savedProjects.length && !savedProjects.some((p) => p.name === taskRef.current)) chooseTask(savedProjects[0].name);
     if (!running && left === settings[mode] * 60) setLeft(saved[mode] * 60);
     /* eslint-enable react-hooks/set-state-in-effect */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
+
+  function chooseTask(name: string) {
+    setTask(name);
+    taskRef.current = name;
+  }
 
   function switchTo(next: Mode) {
     setRunning(false);
@@ -182,13 +193,23 @@ export function Timer({ lang, labels }: { lang: string; labels: Labels }) {
         </svg>
 
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-12 text-center">
-          {mode === "focus" ? (
+          {mode === "focus" && projects.length > 0 ? (
+            <select
+              value={task}
+              onChange={(e) => chooseTask(e.target.value)}
+              aria-label={labels.task}
+              className="w-full max-w-56 rounded-full border border-line bg-surface px-4 py-1.5 text-center text-[13px] focus-visible:border-(--mode) focus-visible:outline-none"
+            >
+              {projects.map((p) => (
+                <option key={p.name} value={p.name}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          ) : mode === "focus" ? (
             <input
               value={task}
-              onChange={(e) => {
-                setTask(e.target.value);
-                taskRef.current = e.target.value;
-              }}
+              onChange={(e) => chooseTask(e.target.value)}
               aria-label={labels.task}
               placeholder={labels.taskPlaceholder}
               suppressHydrationWarning
