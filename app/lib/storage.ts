@@ -1,6 +1,5 @@
 export const SESSIONS_KEY = "focus-sessions";
 export const MINUTES_KEY = "focus-minutes";
-export const TIMER_SETTINGS_KEY = "timer-settings";
 export const THEME_KEY = "theme";
 
 // Durations in minutes; `sessions` is focus sessions before a long break.
@@ -26,17 +25,14 @@ export function rememberLocale(code: string) {
   document.cookie = `NEXT_LOCALE=${code}; path=/; max-age=31536000; samesite=lax`;
 }
 
-export function readTimerSettings(): TimerSettings {
-  try {
-    const saved = JSON.parse(read(TIMER_SETTINGS_KEY) ?? "{}");
-    const settings = { ...DEFAULT_TIMER_SETTINGS };
-    for (const key of Object.keys(settings) as (keyof TimerSettings)[]) {
-      if (Number.isInteger(saved[key]) && saved[key] > 0) settings[key] = saved[key];
-    }
-    return settings;
-  } catch {
-    return DEFAULT_TIMER_SETTINGS;
+// Keeps only valid positive whole numbers from saved data, defaulting the rest.
+function parseTimerSettings(saved: Partial<TimerSettings>): TimerSettings {
+  const settings = { ...DEFAULT_TIMER_SETTINGS };
+  for (const key of Object.keys(settings) as (keyof TimerSettings)[]) {
+    const value = saved[key];
+    if (Number.isInteger(value) && value! > 0) settings[key] = value!;
   }
+  return settings;
 }
 
 export const FOCUS_LOG_KEY = "focus-log";
@@ -61,7 +57,7 @@ export function logFocus(entry: FocusEntry) {
 export const PROJECTS_KEY = "projects";
 
 // `goal` is the daily focus goal in hours; focus sessions log the project name as their task.
-export type Project = { name: string; goal: number; color: string };
+export type Project = TimerSettings & { name: string; goal: number; color: string };
 
 // Default colours handed to new projects in turn; any hex colour can be picked after.
 export const PROJECT_COLORS = ["#e5675a", "#f2b33a", "#6fd3a8", "#5aa9e6", "#b38ce0", "#e58fc1"];
@@ -70,8 +66,12 @@ export function readProjects(): Project[] {
   try {
     const projects = JSON.parse(read(PROJECTS_KEY) ?? "[]");
     if (!Array.isArray(projects)) return [];
-    // Projects saved before colours existed get a default one.
-    return projects.map((p, i) => ({ ...p, color: p.color ?? PROJECT_COLORS[i % PROJECT_COLORS.length] }));
+    // Projects saved before colours or timer durations existed get defaults.
+    return projects.map((p, i) => ({
+      ...p,
+      ...parseTimerSettings(p),
+      color: p.color ?? PROJECT_COLORS[i % PROJECT_COLORS.length],
+    }));
   } catch {
     return [];
   }
